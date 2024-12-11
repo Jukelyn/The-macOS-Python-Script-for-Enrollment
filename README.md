@@ -1,4 +1,4 @@
-This module provides a graphical user interface for gathering user input
+This script provides a graphical user interface for gathering user input
 regarding their name, building, and department for workstation enrollment.
 
 The program is built using the Tkinter library and displays a series of pages:
@@ -20,7 +20,7 @@ scaled based on a scaling factor for better accessibility.
 - Data is saved in a text file with a timestamp and the user's input.
 - The application is intended for use on macOS.
 
-The module also includes helper functions for refreshing the window, clearing
+The script also includes helper functions for refreshing the window, clearing
 widgets, and centering the window on the screen.
 
 Dependencies:
@@ -28,3 +28,6 @@ Dependencies:
 - strftime and subprocess for handling time formatting and executing system
 commands.
 - Callable for typehinting
+
+
+This script requires Python v3.9 or higher.

@@ -353,7 +353,6 @@ def save_input(first_name: str, last_name: str,
     with open("user_input.txt", "a", encoding="utf-8") as f:
         f.write(formatted_information)
 
-    # TODO: Adjust as needed
     bash_command = f"/usr/bin/say {first_name} {last_name}"
     subprocess.run(["bash", "-c", bash_command], check=False)
     root.quit()

@@ -1,3 +1,5 @@
+![License](https://img.shields.io/badge/License-CC%20BY%20NC%20ND%204.0-lightgrey)
+
 This script provides a graphical user interface for gathering user input
 regarding their name, building, and department for workstation enrollment.
 

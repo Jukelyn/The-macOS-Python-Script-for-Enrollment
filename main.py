@@ -31,67 +31,117 @@ commands.
 - Callable for typehinting
 
 """
-import tkinter as tk
 from time import strftime
 import subprocess
 from typing import Callable
+from PIL import Image
+import customtkinter as ctk
+from customtkinter import CTkImage
 
-SCALING_FACTOR = 1.5  # Scale everything by 2.5
+SCALING_FACTOR = 1.5  # Scale everything by 1.5
+# BACKGROUND_PATH = "./assets/4k_backgrounds/belltower-night-3840x2160.jpg"
+BACKGROUND_PATH = "./assets/background-2.jpg"  # belltower night no writing
+BANNER_PATH = "./assets/banner.png"
+
+# Colors
+REYNOLDS_RED = "#990000"
+
+# Font
+BASE_FONT = "Arial"
+
+# Font Sizes
+SMALL_FONT_SIZE = 10
+SMALLER_FONT_SIZE = 11
+STANDARD_FONT_SIZE = 12
+LARGER_FONT_SIZE = 14
+
+# Distances between widgets, configure from here.
+DISTANCE_BETWEEN_ENTRY_X = 8
+DISTANCE_BETWEEN_ENTRY_Y = 5
+
+# Padding
+STANDARD_PADY = 10
+STANDARD_PADX = 20
+
+ctk.set_appearance_mode("dark")
 
 
 def scale(value):
     """
-    Scales the given value by a predefined scaling factor.
-
-    This function multiplies the input value by the constant scaling factor
-    (SCALING_FACTOR) and returns the result as an integer. It's used for
-    adjusting sizes and positions dynamically based on screen resolution.
+    Scales a given value by a predefined scaling factor.
 
     Args:
         value (float): The value to be scaled.
 
     Returns:
-        int: The scaled value, rounded to the nearest integer.
+        int: The scaled value, rounded down to the nearest integer.
     """
     return int(value * SCALING_FACTOR)
 
 
-def center_window(window, width: int, height: int):
+def get_font(scaling: int, bold: bool = False) -> tuple[str, int, str]:
     """
-    Centers the provided window on the screen.
-
-    This function calculates the appropriate position to place the window in
-    the center of the screen based on the screen's resolution and the window's
-    dimensions.
+    Retrieve font configuration based on scaling and style.
 
     Args:
-        window (tk.Tk): The window object to be centered.
-        width (int): The desired width of the window.
-        height (int): The desired height of the window.
+        scaling (int): A scaling factor to adjust the font size.
+        bold (bool, optional): Whether the font should be bold.
+                               Defaults to False.
 
     Returns:
-        None: This function modifies the window's position but does not return
-            a value.
+        tuple[str, int, str]: A tuple containing the font name,
+                              the scaled size, and an optional style
+                              string (e.g., "bold").
     """
+    if bold:
+        return (BASE_FONT, scale(scaling), "normal")
 
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-    x = (screen_width - width) // 2
-    y = (screen_height - height) // 2
-    window.geometry(f"{width}x{height}+{x}+{y}")
+    return (BASE_FONT, scale(scaling), "bold")
+
+
+def load_background(tk: ctk.CTk, image_path: str):
+    """
+    Loads and scales an image to fit the dimensions of a CTk window.
+
+    Args:
+        tk (ctk.CTk): The CTk instance whose dimensions are used
+                      for scaling the image.
+        image_path (str): The file path of the image to be loaded.
+
+    Returns:
+        CTkImage: A CTkImage object resized to fit the window dimensions.
+    """
+    img = Image.open(image_path)
+    width = tk.winfo_width()
+    height = tk.winfo_height()
+
+    return CTkImage(img, size=(width, height))
+
+
+def load_banner(image_path: str):
+    """
+    Loads and resizes an image to create a banner.
+
+    Args:
+        image_path (str): The file path of the image to be loaded.
+
+    Returns:
+        CTkImage: A CTkImage object resized to half of its original dimensions.
+    """
+    img = Image.open(image_path)
+    width, height = img.size
+    # resized_img = img.resize(
+    #     (int(width * 0.5), int(height * 0.5)), Image.Resampling.LANCZOS)
+    return CTkImage(img, size=(int(width * 0.5), int(height * 0.5)))
 
 
 def refresh_window() -> None:
     """
-    Forces the root window to refresh and redraw its contents.
-
-    This function is used to ensure that any changes made to the window or
-    its widgets are immediately reflected on the screen. It triggers the
-    internal update processes of the window.
+    Refreshes the application window by updating its tasks and rendering. This
+    ensures that any pending updates to the UI are processed immediately.
 
     Returns:
-        None: This function performs window updates but does not return a
-            value.
+        None: This function does not return a value.
     """
     root.update_idletasks()
     root.update()
@@ -99,91 +149,104 @@ def refresh_window() -> None:
 
 def clear_root() -> None:
     """
-    Clears all widgets from the root window.
-
-    This function iterates through all child widgets of the root window and
-    destroys them, effectively clearing the window. After clearing the widgets,
-    it refreshes the window to update the display.
+    Clears all widgets from the root window. Removes all child widgets managed
+    by the pack geometry manager and refreshes the window to reflect the
+    changes.
 
     Returns:
-        None: This function modifies the root window but does not return a
-            value.
+        None: This function does not return a value.
     """
-    for widget in root.winfo_children():
+    for widget in root.pack_slaves():
         widget.destroy()
+
     refresh_window()
 
 
-def get_name_label(working_frame: tk.Frame, name_part: str) -> tk.Label:
+def get_name_label(working_frame: ctk.CTkFrame,
+                   name_part: str) -> ctk.CTkLabel:
     """
-    Creates and returns a label widget for the user's name input.
+    Creates and returns a label widget for a name input field.
 
     Args:
-        working_frame (tk.Frame): The parent frame where the label will be
-        placed.
-        name_part (str): The part of the name. Defaults to "".
+        working_frame (ctk.CTkFrame): The frame in which the label will be
+                                      placed.
+        name_part (str): The part of the name (e.g., "First", "Last") to
+                         display in the label.
 
     Returns:
-        tk.Label: A Label widget displaying the appropriate name prompt.
+        ctk.CTkLabel: The created label widget with the specified text and
+                      styling.
     """
     text = f"{name_part} Name:"
-    label = tk.Label(working_frame, text=text, font=("Arial", scale(10)))
-
+    label = ctk.CTkLabel(working_frame, text=text,
+                         font=get_font(STANDARD_FONT_SIZE),
+                         fg_color="transparent")
     return label
 
 
-def grid_position(current_widget: tk.Widget, row: int, col: int):
+def grid_position(current_widget, row: int, col: int):
     """
     Helper function for placing widgets in a grid layout with scaling and
     padding.
 
     Args:
-        current_widget (tk.Widget): The widget (Label, Entry, etc.) to be
-            placed in the grid.
-        row (int): The row position for the widget.
-        col (int): The column position for the widget.
+        current_widget: The widget to be placed in the grid.
+        row (int): The row index in the grid layout.
+        col (int): The column index in the grid layout.
 
     Returns:
-        None: The function places the widget in the grid and does not return a
-        value.
+        None: This function places the widget in the grid and does not return
+              a value.
     """
-    sticky = "e" if isinstance(current_widget, tk.Label) else ""
+    sticky = "e" if isinstance(current_widget, ctk.CTkLabel) else ""
+    return current_widget.grid(row=row, column=col,
+                               padx=scale(DISTANCE_BETWEEN_ENTRY_X),
+                               pady=scale(DISTANCE_BETWEEN_ENTRY_Y),
+                               sticky=sticky)
 
-    return current_widget.grid(row=row, column=col, padx=scale(10),
-                               pady=scale(5), sticky=sticky)
 
-
-def get_entry_field(current_frame: tk.Frame) -> tk.Entry:
+def get_entry_field(current_frame: ctk.CTkFrame,
+                    name_part: str) -> ctk.CTkEntry:
     """
     Creates and returns an entry field widget for user input.
 
     Args:
-        current_frame (tk.Frame): The parent frame where the entry field will
-        be placed.
+        current_frame (ctk.CTkFrame): The frame in which the entry field will
+                                      be placed.
+        name_part (str): The part of the name (e.g., "First", "Last") to be
+                         used as a placeholder text.
 
     Returns:
-        tk.Entry: An Entry widget allowing the user to input text.
+        ctk.CTkEntry: The created entry field widget with the specified
+                      placeholder text and styling.
     """
-    return tk.Entry(current_frame, font=("Arial", scale(10)))
+    return ctk.CTkEntry(current_frame, font=get_font(SMALL_FONT_SIZE),
+                        fg_color="transparent",
+                        placeholder_text=f"{name_part} name")
 
 
-def make_button(current_frame: tk.Frame, text: str,
-                command: Callable[[], None]) -> tk.Button:
+def make_button(current_frame: ctk.CTkFrame, text: str,
+                command: Callable[[], None]) -> ctk.CTkButton:
     """
     Creates a button widget and adds it to the specified frame.
 
     Args:
-        current_frame (tk.Frame): The parent frame where the button will
-            be placed.
-        text (str): The label text to display on the button.
-        command (Callable[[], None]): The function to call when the
-            button is clicked.
+        current_frame (ctk.CTkFrame): The frame in which the button will be
+                                      placed.
+        text (str): The text to display on the button.
+        command (Callable[[], None]): The function to be called when the
+                                      button is clicked.
 
     Returns:
-        tk.Button: A button widget configured with the specified properties.
+        ctk.CTkButton: The created button widget with the specified text,
+                       command, and styling.
     """
-    return tk.Button(current_frame, text=text, font=("Arial", scale(10)),
-                     command=command)
+    return ctk.CTkButton(current_frame, text=text,
+                         font=get_font(SMALLER_FONT_SIZE),
+                         command=command, corner_radius=16,
+                         border_width=3, border_color="black",
+                         border_spacing=7, anchor="center"
+                         )
 
 
 def name_input_page() -> None:
@@ -191,29 +254,36 @@ def name_input_page() -> None:
     Displays the page for entering the user's first and last name, and handles
     navigation to the next page.
 
-    Clears the root window and creates a new frame with fields for the user to
-    input their first and last name. Once both names are entered, the user can
-    click the 'Next' button to proceed to the building and department selection
-    page.
+    This function clears the root window, creates the necessary input fields
+    for the user's first and last name, and adds a button to proceed to the
+    next page after validating that both names have been entered.
 
     Returns:
-        None: This function does not return any value.
+        None: This function does not return a value.
     """
-    clear_root()  # Clear existing widgets
+    clear_root()
 
-    name_input_frame = tk.Frame(root)
+    name_input_frame = ctk.CTkFrame(root)
     name_input_frame.pack(expand=True)
+
+    # bg = load_background(root, BACKGROUND_PATH)
+    # bg_label = ctk.CTkLabel(root, text="", image=bg)
+    # bg_label.place(x=0, y=0)
+
+    # banner_img = load_banner(BANNER_PATH)
+    # banner_img_label = ctk.CTkLabel(root, text="", image=banner_img)
+    # banner_img_label.place(x=0, y=0)
 
     first_name = get_name_label(name_input_frame, "First")
     grid_position(first_name, 0, 0)
 
-    first_name_entry = get_entry_field(name_input_frame)
+    first_name_entry = get_entry_field(name_input_frame, "First")
     grid_position(first_name_entry, 0, 1)
 
     last_name = get_name_label(name_input_frame, "Last")
     grid_position(last_name, 1, 0)
 
-    last_name_entry = get_entry_field(name_input_frame)
+    last_name_entry = get_entry_field(name_input_frame, "Last")
     grid_position(last_name_entry, 1, 1)
 
     def proceed():
@@ -223,108 +293,101 @@ def name_input_page() -> None:
             building_department_input(first_name, last_name)
 
     name_button = make_button(name_input_frame, text="Next", command=proceed)
-    name_button.grid(row=2, columnspan=2, pady=scale(10))
+    name_button.grid(row=2, columnspan=2, pady=scale(STANDARD_PADY))
 
     root.bind("<Return>", lambda event: proceed())
 
 
-def get_selection_label(current_frame: tk.Frame, selection: str) -> tk.Label:
+def get_selection_label(current_frame: ctk.CTkFrame,
+                        selection: str) -> ctk.CTkLabel:
     """
     Creates and returns a label widget prompting the user to select an option.
 
     Args:
-        current_frame (tk.Frame): The parent frame where the label will be
-            placed.
-        selection (str): The specific selection prompt. Defaults to "".
+        current_frame (ctk.CTkFrame): The frame in which the label will be
+                                      placed.
+        selection (str): The option to be selected (e.g., "Department", "Role")
+                         that will be displayed in the label.
 
     Returns:
-        tk.Label: A label widget with the formatted selection prompt.
+        ctk.CTkLabel: The created label widget with the prompt text and
+                      styling.
     """
     text = f"Select your {selection}:"
-
-    label = tk.Label(current_frame, text=text,
-                     font=("Arial", scale(10)))
-    label.pack(pady=scale(10), padx=scale(20))
-
+    label = ctk.CTkLabel(current_frame, text=text,
+                         font=get_font(STANDARD_FONT_SIZE))
+    label.pack(pady=scale(STANDARD_PADY), padx=scale(STANDARD_PADX))
     return label
 
 
-def get_dropdown(current_frame: tk.Frame, options: list[str]) -> tk.StringVar:
+def get_dropdown(current_frame: ctk.CTkFrame,
+                 options: list[str]) -> ctk.StringVar:
     """
     Creates a dropdown menu with a list of options and returns the variable
     holding the selected option.
 
     Args:
-        current_frame (tk.Frame): The parent frame where the dropdown will be
-            placed.
+        current_frame (ctk.CTkFrame): The frame in which the dropdown menu
+                                      will be placed.
         options (list[str]): A list of options to be displayed in the dropdown
-            menu.
+                             menu.
 
     Returns:
-        tk.StringVar: A StringVar that holds the selected option from the
-            dropdown.
+        ctk.StringVar: A StringVar that holds the selected option from the
+                       dropdown menu.
     """
-    dropdown_str_var = tk.StringVar(current_frame)
+    dropdown_str_var = ctk.StringVar(current_frame)
     dropdown_str_var.set(options[0])  # Default to the first option
-    dropdown = tk.OptionMenu(current_frame, dropdown_str_var, *options)
-    dropdown.pack(pady=scale(10), padx=scale(20))
+    dropdown = ctk.CTkOptionMenu(
+        current_frame, variable=dropdown_str_var, values=options)
+    dropdown.pack(pady=scale(STANDARD_PADY), padx=scale(20))
 
-    # Adjust dropdown font size (selected)
-    dropdown.config(font=("Arial", scale(10)))
-
-    # Adjust dropdown font size (non-selected)
-    dropdown["menu"].config(font=("Arial", scale(7)))
+    dropdown.configure(font=get_font(SMALL_FONT_SIZE))
 
     return dropdown_str_var
 
 
 def building_department_input(first_name: str, last_name: str):
     """
-    Displays the page for selecting the building and department,
-    and handles saving the selections.
+    Displays the page for selecting the building and department, and handles
+    saving the selections.
 
-    Clears the root window and creates a new frame with dropdown menus for
-    selecting the building and department. Once both selections are made, the
-    user can click the 'Submit' button to save the input and proceed.
+    This function clears the root window, presents dropdown menus for selecting
+    a building and department, and provides a button to submit the selections.
+    Upon submission, the selections are saved.
 
     Args:
         first_name (str): The user's first name.
         last_name (str): The user's last name.
 
     Returns:
-        None: This function does not return any value.
+        None: This function does not return a value.
     """
-    clear_root()  # Clear existing widgets
+    clear_root()
 
-    building_department_frame = tk.Frame(root)
+    building_department_frame = ctk.CTkFrame(root)
     building_department_frame.pack(expand=True)
 
-    # Building Label
     get_selection_label(building_department_frame, "building")
 
-    # Building Dropdown
-    buildings = ["SAS Hall", "Thomas Hall", "Ricks Hall"]
-    # This creates the dropdown
+    buildings = ["SAS Hall", "Thomas Hall", "Ricks Hall", "Other"]
     building_str_var = get_dropdown(building_department_frame, buildings)
 
-    # Department Label
     get_selection_label(building_department_frame, "department")
 
-    # Department Dropdown
-    departments = ["Math", "Biology", "Chemistry", "Physics"]
-    # This creates the dropdown
+    departments = ["Mathematics", "Biology", "Chemistry", "Physics"]
     department_str_var = get_dropdown(building_department_frame, departments)
 
-    # Submit Button
     def proceed():
         building = building_str_var.get()
         department = department_str_var.get()
-        save_input(first_name, last_name, building, department)
+        if building and department:
+            save_input(first_name, last_name, building, department)
 
-    submit_button = make_button(building_department_frame, text="Submit",
-                                command=proceed)
+    submit_button = make_button(
+        building_department_frame, text="Submit", command=proceed)
     root.bind("<Return>", lambda event: proceed())
-    submit_button.pack(pady=scale(10), padx=scale(20))
+    submit_button.pack(pady=scale(STANDARD_PADY), padx=scale(STANDARD_PADX))
 
 
 def save_input(first_name: str, last_name: str,
@@ -333,22 +396,22 @@ def save_input(first_name: str, last_name: str,
     Saves the user's input (name, building, department) to a text file
     and performs a system action.
 
-    The function appends the user's information along with the current
-    timestamp to a file. It also executes a system command to speak the user's
-    name and then exits the application.
+    The function appends the provided user input, along with the current
+    timestamp, to a file called "user_input.txt". It also executes a system
+    command and then quits the application.
 
     Args:
         first_name (str): The user's first name.
         last_name (str): The user's last name.
-        building (str): The building selected by the user.
-        department (str): The department selected by the user.
+        building (str): The selected building.
+        department (str): The selected department.
 
     Returns:
-        None: This function does not return any value.
+        None: This function does not return a value.
     """
     current_time = strftime("%Y-%m-%d %H:%M:%S")
-    formatted_information = f"{current_time} - {first_name} \
-{last_name} - {building} - {department}\n"
+    formatted_information = f"{
+        current_time} - {first_name} {last_name} - {building} - {department}\n"
 
     with open("user_input.txt", "a", encoding="utf-8") as f:
         f.write(formatted_information)
@@ -359,23 +422,34 @@ def save_input(first_name: str, last_name: str,
 
 
 # Main window
-root = tk.Tk()
+root = ctk.CTk()
 root.title("Acknowledgement")
 root.attributes('-fullscreen', True)
-root.protocol("WM_DELETE_WINDOW", lambda: None)  # Prevent closing
-center_window(root, scale(600), scale(150))
+root.overrideredirect(True)
+
+
+background = load_background(root, BACKGROUND_PATH)
+background_label = ctk.CTkLabel(root, text="", image=background)
+background_label.place(x=0, y=0)
+
+banner_image = load_banner(BANNER_PATH)
+banner_label = ctk.CTkLabel(root, text="", image=banner_image)
+banner_label.place(x=0, y=0)
 
 # Initial Page
-frame = tk.Frame(root)
+frame = ctk.CTkFrame(root)
 frame.pack(expand=True)
 
-ACKNOWLEDGE_MESSAGE = "Please answer a few quick questions to get \
-this workstation properly enrolled with management."
+ACKNOWLEDGE_MESSAGE = "Please answer a few quick questions to get this \
+workstation properly enrolled with management."
 
-tk.Label(frame, text=ACKNOWLEDGE_MESSAGE, font=(
-    "Arial", scale(10))).pack(pady=scale(20))
-acknowledge_button = make_button(frame, text="Acknowledge & Next",
-                                 command=name_input_page)
-acknowledge_button.pack(pady=scale(10))
+ctk.CTkLabel(frame, text=ACKNOWLEDGE_MESSAGE,
+             font=get_font(LARGER_FONT_SIZE, True),
+             pady=scale(STANDARD_PADY * 5), padx=scale(STANDARD_PADX * 2.5),
+             fg_color=REYNOLDS_RED).pack(expand=True)
+
+acknowledge_button = make_button(
+    frame, text="Next", command=name_input_page)
+acknowledge_button.pack(pady=scale(STANDARD_PADX // 2))
 
 root.mainloop()

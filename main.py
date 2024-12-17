@@ -63,6 +63,10 @@ DISTANCE_BETWEEN_ENTRY_Y = 5
 STANDARD_PADY = 10
 STANDARD_PADX = 20
 
+FIRST_NAME = ""
+LAST_NAME = ""
+BASH_COMMAND = f"/usr/bin/say {FIRST_NAME} {LAST_NAME}"
+
 ctk.set_appearance_mode("dark")
 
 
@@ -410,14 +414,18 @@ def save_input(first_name: str, last_name: str,
         None: This function does not return a value.
     """
     current_time = strftime("%Y-%m-%d %H:%M:%S")
+    global FIRST_NAME, LAST_NAME  # pylint: disable=W0603
+    FIRST_NAME = first_name
+    LAST_NAME = last_name
+
     formatted_information = f"{
-        current_time} - {first_name} {last_name} - {building} - {department}\n"
+        current_time} - {FIRST_NAME} {LAST_NAME} - {building} - {department}\n"
 
     with open("user_input.txt", "a", encoding="utf-8") as f:
         f.write(formatted_information)
 
-    bash_command = f"/usr/bin/say {first_name} {last_name}"
-    subprocess.run(["bash", "-c", bash_command], check=False)
+    subprocess.run(["bash", "-c", BASH_COMMAND +
+                   f' "{FIRST_NAME} {LAST_NAME}"'], check=False)
     root.quit()
 
 

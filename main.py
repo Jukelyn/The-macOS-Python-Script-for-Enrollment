@@ -419,7 +419,7 @@ def save_input(first_name: str, last_name: str,
     LAST_NAME = last_name
 
     formatted_information = f"{current_time} - {FIRST_NAME} {LAST_NAME} "
-    formatted_information += "- {building} - {department}\n"
+    formatted_information += f"- {building} - {department}\n"
 
     with open("user_input.txt", "a", encoding="utf-8") as f:
         f.write(formatted_information)

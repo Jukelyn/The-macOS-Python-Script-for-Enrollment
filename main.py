@@ -1,46 +1,60 @@
-"""
-This module provides a graphical user interface for gathering user input
-regarding their name, building, and department for workstation enrollment.
+#!/usr/bin/env python
+"""This program provides a GUI for gathering user input for enrollment.
 
-The program is built using the Tkinter library and displays a series of pages:
+The program uses the CustomTkinter library to display a series of pages:
 
 1. **Acknowledgement Page**: A message asking the user to acknowledge and
-proceed with the input process.
+   proceed with the input process.
 
 2. **Name Input Page**: Prompts the user to enter their first and last names.
 
 3. **Building and Department Selection Page**: Allows the user to select their
-building and department from predefined dropdown options.
+   building and department from predefined dropdown options.
 
 4. **Save and Submit**: After gathering the necessary information, the data is
-saved into a text file.
+   saved into a text file.
 
-Key functionalities:
+Key notes:
 - The GUI elements (labels, entry fields, dropdowns, buttons) are dynamically
-scaled based on a scaling factor for better accessibility.
-- Data is saved in a text file with a timestamp and the user's input.
-- The application is intended for use on macOS.
+  scaled based on a scaling factor for better accessibility.
+- Data is currenly saved in a text file with a timestamp and the user's input.
+- The program is intended for use on macOS.
 
-The module also includes helper functions for refreshing the window, clearing
+The program also includes helper functions for refreshing the window, clearing
 widgets, and centering the window on the screen.
 
 Dependencies:
-- Tkinter for GUI components.
-- strftime and subprocess for handling time formatting and executing system
-commands.
+- CustomTkinter for the GUI components.
+- Pillow for image processing (background and banner images)
 - Callable for typehinting
-
+- strftime and subprocess for handling time formatting and executing system
+  commands.
 """
-from time import strftime
 import subprocess
+from time import strftime
 from typing import Callable
+
 from PIL import Image
 import customtkinter as ctk
 from customtkinter import CTkImage
 
+__author__ = "Mehraz Ahmed and Imraan Azad Khan"
+__copyright__ = "Copyright 2024, macOS Enrollment Program"
+__credits__ = ["Mehraz Ahmed", "Imraan Azad Khan"]
+__license__ = "CC BY-NC-ND (https://creativecommons.org/licenses/by-nc-nd/4.0)"
+__version__ = "4.0"
+__maintainer__ = "Mehraz Ahmed"
+__email__ = "mahmed6@ncsu.edu"
+__status__ = "Development"  # "Prototype", "Development", or "Production"
+
+ACKNOWLEDGE_MESSAGE = "College of Sciences\n\n\n"
+ACKNOWLEDGE_MESSAGE += "Please answer a few quick questions to get this \
+workstation properly enrolled with management."
+
 SCALING_FACTOR = 1.5  # Scale everything by 1.5
+
 # BACKGROUND_PATH = "./assets/4k_backgrounds/belltower-night-3840x2160.jpg"
-BACKGROUND_PATH = "./assets/background-2.jpg"  # belltower night no writing
+BACKGROUND_PATH = "./assets/background.jpg"  # belltower night no writing
 BANNER_PATH = "./assets/banner.png"
 
 # Colors
@@ -103,9 +117,31 @@ def get_font(scaling: int, bold: bool = False) -> tuple[str, int, str]:
     return (BASE_FONT, scale(scaling), "bold")
 
 
+def get_info_list(filename: str) -> list[str]:
+    """Reads lines from text file and returns a list of the contents.
+
+    Args:
+        filename (str): The file name to parse
+
+    Returns:
+        list[str]: List of parsed information
+    """
+    info_list = []
+
+    with open(filename, "r", encoding="utf-8") as file:
+        for line in file:
+            info_list.append(line.strip())
+
+        return info_list
+
+
+BUILDINGS = sorted(get_info_list("buildings.txt"))
+DEPARTMENTS = sorted(get_info_list("departments.txt"))
+
+
 def load_background(tk: ctk.CTk, image_path: str):
     """
-    Loads and scales an image to fit the dimensions of a CTk window.
+    Load and scale an image to fit the dimensions of a CTk window.
 
     Args:
         tk (ctk.CTk): The CTk instance whose dimensions are used
@@ -124,7 +160,7 @@ def load_background(tk: ctk.CTk, image_path: str):
 
 def load_banner(image_path: str):
     """
-    Loads and resizes an image to create a banner.
+    Load and resize an image to create a banner.
 
     Args:
         image_path (str): The file path of the image to be loaded.
@@ -141,7 +177,7 @@ def load_banner(image_path: str):
 
 def refresh_window() -> None:
     """
-    Refreshes the application window by updating its tasks and rendering. This
+    Refresh the program window by updating its tasks and rendering. This
     ensures that any pending updates to the UI are processed immediately.
 
     Returns:
@@ -153,7 +189,7 @@ def refresh_window() -> None:
 
 def clear_root() -> None:
     """
-    Clears all widgets from the root window. Removes all child widgets managed
+    Clear all widgets from the root window. Removes all child widgets managed
     by the pack geometry manager and refreshes the window to reflect the
     changes.
 
@@ -169,7 +205,7 @@ def clear_root() -> None:
 def get_name_label(working_frame: ctk.CTkFrame,
                    name_part: str) -> ctk.CTkLabel:
     """
-    Creates and returns a label widget for a name input field.
+    Create and returns a label widget for a name input field.
 
     Args:
         working_frame (ctk.CTkFrame): The frame in which the label will be
@@ -190,8 +226,7 @@ def get_name_label(working_frame: ctk.CTkFrame,
 
 def grid_position(current_widget, row: int, col: int):
     """
-    Helper function for placing widgets in a grid layout with scaling and
-    padding.
+    Places widgets in a grid layout with scaling and padding.
 
     Args:
         current_widget: The widget to be placed in the grid.
@@ -212,7 +247,7 @@ def grid_position(current_widget, row: int, col: int):
 def get_entry_field(current_frame: ctk.CTkFrame,
                     name_part: str) -> ctk.CTkEntry:
     """
-    Creates and returns an entry field widget for user input.
+    Create and returns an entry field widget for user input.
 
     Args:
         current_frame (ctk.CTkFrame): The frame in which the entry field will
@@ -232,7 +267,7 @@ def get_entry_field(current_frame: ctk.CTkFrame,
 def make_button(current_frame: ctk.CTkFrame, text: str,
                 command: Callable[[], None]) -> ctk.CTkButton:
     """
-    Creates a button widget and adds it to the specified frame.
+    Create a button widget and adds it to the specified frame.
 
     Args:
         current_frame (ctk.CTkFrame): The frame in which the button will be
@@ -255,7 +290,7 @@ def make_button(current_frame: ctk.CTkFrame, text: str,
 
 def name_input_page() -> None:
     """
-    Displays the page for entering the user's first and last name, and handles
+    Display the page for entering the user's first and last name, and handles
     navigation to the next page.
 
     This function clears the root window, creates the necessary input fields
@@ -305,7 +340,7 @@ def name_input_page() -> None:
 def get_selection_label(current_frame: ctk.CTkFrame,
                         selection: str) -> ctk.CTkLabel:
     """
-    Creates and returns a label widget prompting the user to select an option.
+    Create and returns a label widget prompting the user to select an option.
 
     Args:
         current_frame (ctk.CTkFrame): The frame in which the label will be
@@ -327,7 +362,7 @@ def get_selection_label(current_frame: ctk.CTkFrame,
 def get_dropdown(current_frame: ctk.CTkFrame,
                  options: list[str]) -> ctk.StringVar:
     """
-    Creates a dropdown menu with a list of options and returns the variable
+    Create a dropdown menu with a list of options and returns the variable
     holding the selected option.
 
     Args:
@@ -353,7 +388,7 @@ def get_dropdown(current_frame: ctk.CTkFrame,
 
 def building_department_input(first_name: str, last_name: str):
     """
-    Displays the page for selecting the building and department, and handles
+    Display the page for selecting the building and department, and handles
     saving the selections.
 
     This function clears the root window, presents dropdown menus for selecting
@@ -374,13 +409,11 @@ def building_department_input(first_name: str, last_name: str):
 
     get_selection_label(building_department_frame, "building")
 
-    buildings = ["SAS Hall", "Thomas Hall", "Ricks Hall", "Other"]
-    building_str_var = get_dropdown(building_department_frame, buildings)
+    building_str_var = get_dropdown(building_department_frame, BUILDINGS)
 
     get_selection_label(building_department_frame, "department")
 
-    departments = ["Mathematics", "Biology", "Chemistry", "Physics"]
-    department_str_var = get_dropdown(building_department_frame, departments)
+    department_str_var = get_dropdown(building_department_frame, DEPARTMENTS)
 
     def proceed():
         building = building_str_var.get()
@@ -397,12 +430,12 @@ def building_department_input(first_name: str, last_name: str):
 def save_input(first_name: str, last_name: str,
                building: str, department: str) -> None:
     """
-    Saves the user's input (name, building, department) to a text file
+    Save the user's input (name, building, department) to a text file
     and performs a system action.
 
     The function appends the provided user input, along with the current
     timestamp, to a file called "user_input.txt". It also executes a system
-    command and then quits the application.
+    command and then quits the program.
 
     Args:
         first_name (str): The user's first name.
@@ -447,9 +480,6 @@ banner_label.place(x=0, y=0)
 # Initial Page
 frame = ctk.CTkFrame(root)
 frame.pack(expand=True)
-
-ACKNOWLEDGE_MESSAGE = "Please answer a few quick questions to get this \
-workstation properly enrolled with management."
 
 ctk.CTkLabel(frame, text=ACKNOWLEDGE_MESSAGE,
              font=get_font(LARGER_FONT_SIZE, True),

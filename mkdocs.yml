@@ -1,0 +1,48 @@
+site_name: macOS Enrollment Program Docs
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  language: en
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline 
+        name: Switch to dark mode
+      primary: teal
+      accent: blue 
+    - scheme: slate 
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode    
+      primary: red
+      accent: blue
+
+plugins:
+  - mkdocstrings
+  - search
+
+markdown_extensions:
+  - pymdownx.highlight:
+      auto_title: true
+      anchor_linenums: true
+      line_spans: __span
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.mark
+  - attr_list
+
+copyright: |
+  &copy; 2024 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0"  target="_blank" rel="noopener">CC BY-NC-ND 4.0</a>

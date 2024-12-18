@@ -2,7 +2,6 @@ user_input.txt
 notes
 .DS_Store*
 
-assets*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,0 +1,4 @@
+- COS somewhere
+- add buildings that is under COS
+- list of depts ( in COS )
+  - look in jamf for this

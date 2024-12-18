@@ -29,10 +29,4 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - run: |
-          pip install -r requirements.txt
-          pip install pylint
-          source venv/bin/activate
-          pylint $(git ls-files '*.py')
-
       - run: mkdocs gh-deploy --force

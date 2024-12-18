@@ -30,6 +30,7 @@ jobs:
           pip install -r requirements.txt
 
       - run: |
+          pip install pylint
           source venv/bin/activate
           pylint $(git ls-files '*.py')
 

@@ -30,4 +30,6 @@ jobs:
           pip install -r requirements.txt
           pip install mkdocs mkdocs-material mkdocstrings[python]
 
-      - run: mkdocs gh-deploy --force
+      - run: |
+          source venv/bin/activate
+          mkdocs gh-deploy --force

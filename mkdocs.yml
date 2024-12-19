@@ -14,13 +14,13 @@ theme:
     - content.code.copy
   language: en
   palette:
-    - scheme: default
+    - scheme: slate
       toggle:
         icon: material/toggle-switch-off-outline 
         name: Switch to dark mode
       primary: teal
       accent: blue 
-    - scheme: slate 
+    - scheme: default
       toggle:
         icon: material/toggle-switch
         name: Switch to light mode    
@@ -29,10 +29,10 @@ theme:
 
 plugins:
   - mkdocstrings
-      handlers:
-        python:
-          options:
-            members_order: source
+    handlers:
+      python:
+        options:
+          members_order: source
   - search
 
 markdown_extensions:

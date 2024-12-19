@@ -3,8 +3,8 @@ site_name: macOS Enrollment Program Docs
 theme:
   name: material
   features:
-    - navigation.tabs
     - navigation.sections
+    - navigation.footer
     - toc.integrate
     - navigation.top
     - search.suggest
@@ -29,6 +29,10 @@ theme:
 
 plugins:
   - mkdocstrings
+      handlers:
+        python:
+          options:
+            members_order: source
   - search
 
 markdown_extensions:

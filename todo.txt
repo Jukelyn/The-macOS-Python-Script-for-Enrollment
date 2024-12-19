@@ -1,4 +1,5 @@
 - Add all buildings that is under COS
+- Make buildings that are added to dropbox change based on department
 
 jamf command:
 /usr/local/bin/jamf recon [flags]
@@ -9,7 +10,7 @@ jamf command:
 -department [str]   '-department NCSU-COS-[department]'
 
 list of departments:
-NCSU-COS            Other?
+NCSU-COS            Other
 NCSU-COS-BIO        Biology
 NCSU-COS-BRC        Bioinformatics
 NCSU-COS-CHEM       Chemistry

@@ -15,19 +15,19 @@ The program uses the CustomTkinter library to display a series of pages:
    saved into a text file.
 
 Key notes:
-- The GUI elements (labels, entry fields, dropdowns, buttons) are dynamically
+* The GUI elements (labels, entry fields, dropdowns, buttons) are dynamically
   scaled based on a scaling factor for better accessibility.
-- Data is currenly saved in a text file with a timestamp and the user's input.
-- The program is intended for use on macOS.
+* Data is currenly saved in a text file with a timestamp and the user's input.
+* The program is intended for use on macOS with Python v3.9 or higher.
 
 The program also includes helper functions for refreshing the window, clearing
 widgets, and centering the window on the screen.
 
 Dependencies:
-- CustomTkinter for the GUI components.
-- Pillow for image processing (background and banner images)
-- Callable for typehinting
-- strftime and subprocess for handling time formatting and executing system
+* CustomTkinter for the GUI components.
+* Pillow for image processing (background and banner images)
+* Callable for typehinting
+* strftime and subprocess for handling time formatting and executing system
   commands.
 """
 import subprocess

@@ -28,11 +28,11 @@ theme:
       accent: blue
 
 plugins:
-  - mkdocstrings
-    handlers:
-      python:
-        options:
-          members_order: source
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            members_order: source
   - search
 
 markdown_extensions:
@@ -49,4 +49,4 @@ markdown_extensions:
   - attr_list
 
 copyright: |
-  &copy; 2024 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0"  target="_blank" rel="noopener">CC BY-NC-ND 4.0</a>
+  &copy; 2024 <a href="https://creativecommons.org/licenses/by-nc-nd

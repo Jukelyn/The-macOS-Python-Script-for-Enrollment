@@ -5,6 +5,7 @@ click==8.1.7
 colorama==0.4.6
 customtkinter==5.2.2
 darkdetect==0.8.0
+docstring_parser_fork==0.0.9
 ghp-import==2.1.0
 griffe==1.5.1
 idna==3.10
@@ -24,6 +25,7 @@ paginate==0.5.7
 pathspec==0.12.1
 pillow==11.0.0
 platformdirs==4.3.6
+pydoclint==0.5.12
 Pygments==2.18.0
 pymdown-extensions==10.12
 python-dateutil==2.9.0.post0

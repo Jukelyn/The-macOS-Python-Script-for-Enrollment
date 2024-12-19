@@ -132,6 +132,8 @@ def get_buildings_list(filename: str) -> list[str]:
     return sorted(info_list)
 
 
+BUILDINGS = get_buildings_list("buildings.txt")
+
 DEPARTMENTS = {
     "Biology": "NCSU-COS-BIO",
     "Bioinformatics": "NCSU-COS-BRC",
@@ -143,8 +145,6 @@ DEPARTMENTS = {
     "Statistics": "NCSU-COS-STAT",
     "Other": "NCSU-COS"
 }
-
-BUILDINGS = get_buildings_list("buildings.txt")
 
 
 def load_background(tk: ctk.CTk, image_path: str):
@@ -418,19 +418,20 @@ def building_department_input(first_name: str, last_name: str):
     building_department_frame = ctk.CTkFrame(root)
     building_department_frame.pack(expand=True)
 
+    get_selection_label(building_department_frame, "department")
+
+    department_str_var = get_dropdown(
+        building_department_frame, list(DEPARTMENTS.keys()))
+
     get_selection_label(building_department_frame, "building")
 
     building_str_var = get_dropdown(building_department_frame, BUILDINGS)
 
-    get_selection_label(building_department_frame, "department")
-
-    department_str_var = get_dropdown(building_department_frame, DEPARTMENTS)
-
     def proceed():
-        building = building_str_var.get()
         department = department_str_var.get()
-        if building and department:
-            save_input(first_name, last_name, building, department)
+        building = building_str_var.get()
+        if department and building:
+            save_input(first_name, last_name, department, building)
 
     submit_button = make_button(
         building_department_frame, text="Submit", command=proceed)
@@ -439,7 +440,7 @@ def building_department_input(first_name: str, last_name: str):
 
 
 def save_input(first_name: str, last_name: str,
-               building: str, department: str) -> None:
+               department: str, building: str) -> None:
     """
     Save the user's input (name, building, department) to a text file
     and performs a system action.
@@ -462,7 +463,7 @@ def save_input(first_name: str, last_name: str,
     # command = (
     #     f'sudo /usr/bin/jamf recon -realname "{first_name} {last_name}"'
     #     f' -building "{building}"'
-    #     # f' -department {DEPARTMENT}'
+    #     # f' -department {DEPARTMENTS[department]}'
     # )
 
     # jamf command:
@@ -475,10 +476,10 @@ def save_input(first_name: str, last_name: str,
 
     formatted_information = (
         f"{current_time} - {first_name} {last_name}"
-        f" - {building} - {department}\n"
+        f" - {building} - {DEPARTMENTS[department]} ({department})\n"
     )
 
-    with open("user_input.txt", "a", encoding="utf-8") as f:
+    with open("info_log.txt", "a", encoding="utf-8") as f:
         f.write(formatted_information)
 
     subprocess.run(["bash", "-c", command], check=False)

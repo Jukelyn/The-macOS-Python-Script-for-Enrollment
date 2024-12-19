@@ -1,3 +1,7 @@
+# macOS Enrollment Program
+
+The full documentation can be found [here on GitHub Pages](https://jukelyn.github.io/macOS-Enrollment-Program/).
+
 ![License](https://img.shields.io/badge/License-CC%20BY%20NC%20ND%204.0-lightgrey)
 
 This script provides a graphical user interface for gathering user input

@@ -79,7 +79,7 @@ STANDARD_PADX = 20
 
 FIRST_NAME = ""
 LAST_NAME = ""
-BASH_COMMAND = '/usr/bin/whoami'
+BASH_COMMAND = f'/usr/bin/say "{FIRST_NAME} {LAST_NAME}"'
 
 ctk.set_appearance_mode("dark")
 
@@ -130,13 +130,18 @@ def get_info_list(filename: str) -> list[str]:
 
     with open(filename, "r", encoding="utf-8") as file:
         for line in file:
-            info_list.append(line.strip())
+            if line.strip().lower() == "other":
+                continue
+            if line.strip() != "":
+                info_list.append(line.strip())
 
-        return info_list
+    return sorted(info_list)
 
 
-BUILDINGS = sorted(get_info_list("buildings.txt"))
-DEPARTMENTS = sorted(get_info_list("departments.txt"))
+DEPARTMENTS = get_info_list("departments.txt")
+DEPARTMENTS.append("Other")
+
+BUILDINGS = get_info_list("buildings.txt")
 
 
 def load_background(tk: ctk.CTk, image_path: str):
@@ -320,6 +325,8 @@ def name_input_page() -> None:
     first_name_entry = get_entry_field(name_input_frame, "First")
     grid_position(first_name_entry, 0, 1)
 
+    first_name_entry.focus()
+
     last_name = get_name_label(name_input_frame, "Last")
     grid_position(last_name, 1, 0)
 
@@ -334,8 +341,6 @@ def name_input_page() -> None:
 
     name_button = make_button(name_input_frame, text="Next", command=proceed)
     name_button.grid(row=2, columnspan=2, pady=scale(STANDARD_PADY))
-
-    root.after(100, lambda: first_name_entry.focus())
 
     root.bind("<Return>", lambda event: proceed())
 

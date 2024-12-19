@@ -79,7 +79,7 @@ STANDARD_PADX = 20
 
 FIRST_NAME = ""
 LAST_NAME = ""
-BASH_COMMAND = f"/usr/bin/say {FIRST_NAME} {LAST_NAME}"
+BASH_COMMAND = '/usr/bin/whoami'
 
 ctk.set_appearance_mode("dark")
 
@@ -259,6 +259,7 @@ def get_entry_field(current_frame: ctk.CTkFrame,
         ctk.CTkEntry: The created entry field widget with the specified
                       placeholder text and styling.
     """
+
     return ctk.CTkEntry(current_frame, font=get_font(SMALL_FONT_SIZE),
                         fg_color="transparent",
                         placeholder_text=f"{name_part} name")
@@ -333,6 +334,8 @@ def name_input_page() -> None:
 
     name_button = make_button(name_input_frame, text="Next", command=proceed)
     name_button.grid(row=2, columnspan=2, pady=scale(STANDARD_PADY))
+
+    root.after(100, lambda: first_name_entry.focus())
 
     root.bind("<Return>", lambda event: proceed())
 
@@ -457,17 +460,16 @@ def save_input(first_name: str, last_name: str,
     with open("user_input.txt", "a", encoding="utf-8") as f:
         f.write(formatted_information)
 
-    subprocess.run(["bash", "-c", BASH_COMMAND +
-                   f' "{FIRST_NAME} {LAST_NAME}"'], check=False)
-    root.quit()
+    subprocess.run(["bash", "-c", BASH_COMMAND], check=False)
+    root.destroy()
 
 
 # Main window
 root = ctk.CTk()
 root.title("Acknowledgement")
 root.attributes('-fullscreen', True)
-root.overrideredirect(True)
-
+# root.overrideredirect(True)
+root.protocol("WM_DELETE_WINDOW", lambda: None)
 
 background = load_background(root, BACKGROUND_PATH)
 background_label = ctk.CTkLabel(root, text="", image=background)

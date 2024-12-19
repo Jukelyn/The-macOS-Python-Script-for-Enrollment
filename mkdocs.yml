@@ -2,6 +2,7 @@ site_name: macOS Enrollment Program Docs
 
 theme:
   name: material
+  custom_dir: overrides
   features:
     - navigation.sections
     - navigation.footer
@@ -22,7 +23,7 @@ theme:
       accent: blue 
     - scheme: default
       toggle:
-        icon: material/toggle-switch-off-outline 
+        icon: material/toggle-switch-off-outline
         name: Switch to light mode    
       primary: red
       accent: blue
@@ -47,6 +48,3 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.mark
   - attr_list
-
-copyright: |
-  &copy; 2024 <a href="https://creativecommons.org/licenses/by-nc-nd

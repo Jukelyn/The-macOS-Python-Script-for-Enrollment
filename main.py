@@ -8,8 +8,8 @@ The program uses the CustomTkinter library to display a series of pages:
 
 2. **Name Input Page**: Prompts the user to enter their first and last names.
 
-3. **Building and Department Selection Page**: Allows the user to select their
-   building and department from predefined dropdown options.
+3. **Department and Building Selection Page**: Allows the user to select their
+   department and building from predefined dropdown options.
 
 4. **Save and Submit**: After gathering the necessary information, the data is
    saved into a text file.
@@ -31,6 +31,8 @@ Dependencies:
 * Callable for typehinting
 * strftime and subprocess for handling time formatting and executing system
   commands.
+
+This project was made possible by Mehraz Ahmed with the help of Imraan Khan.
 """
 import subprocess
 from time import strftime

@@ -77,10 +77,6 @@ DISTANCE_BETWEEN_ENTRY_Y = 5
 STANDARD_PADY = 10
 STANDARD_PADX = 20
 
-FIRST_NAME = ""
-LAST_NAME = ""
-BASH_COMMAND = f'/usr/bin/say "{FIRST_NAME} {LAST_NAME}"'
-
 ctk.set_appearance_mode("dark")
 
 
@@ -455,17 +451,29 @@ def save_input(first_name: str, last_name: str,
         None: This function does not return a value.
     """
     current_time = strftime("%Y-%m-%d %H:%M:%S")
-    global FIRST_NAME, LAST_NAME  # pylint: disable=W0603
-    FIRST_NAME = first_name
-    LAST_NAME = last_name
+    command = f'/usr/bin/say "{first_name} {last_name}"'
+    # command = (
+    #     f'sudo /usr/bin/jamf recon -realname "{first_name} {last_name}"'
+    #     f' -building {building}'
+    #     # f' -department {DEPARTMENT}'
+    # )
+    # jamf command:
+    # /usr/local/bin/jamf recon [flags]
+    # -realname [str]     '-realname "[first name] [last name]"'
+    # -email [str]        '-email [unityID]@ncsu.edu'
+    # -building [str]     '-building [SOMETHING Hall]'
+    # -room [str]         '-room NCSU-[buidling]-####'
+    # -department [str]   '-department NCSU-COS-[department]'
 
-    formatted_information = f"{current_time} - {FIRST_NAME} {LAST_NAME} "
-    formatted_information += f"- {building} - {department}\n"
+    formatted_information = (
+        f"{current_time} - {first_name} {last_name}"
+        f" - {building} - {department}\n"
+    )
 
     with open("user_input.txt", "a", encoding="utf-8") as f:
         f.write(formatted_information)
 
-    subprocess.run(["bash", "-c", BASH_COMMAND], check=False)
+    subprocess.run(["bash", "-c", command], check=False)
     root.destroy()
 
 

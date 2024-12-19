@@ -136,21 +136,6 @@ def get_buildings_list(filename: str) -> list[str]:
     return sorted(info_list)
 
 
-BUILDINGS = get_buildings_list("buildings.txt")
-
-DEPARTMENTS = {
-    "Biology": "NCSU-COS-BIO",
-    "Bioinformatics": "NCSU-COS-BRC",
-    "Chemistry": "NCSU-COS-CHEM",
-    "Mathematics": "NCSU-COS-MATH",
-    "MEAS": "NCSU-COS-MEAS",
-    "Physics": "NCSU-COS-PHYSICS",
-    "SCO": "NCSU-COS-SCO",
-    "Statistics": "NCSU-COS-STAT",
-    "Other": "NCSU-COS"
-}
-
-
 def load_background(tk: ctk.CTk, image_path: str):
     """
     Load and scale an image to fit the dimensions of a CTk window.
@@ -375,67 +360,100 @@ def get_selection_label(current_frame: ctk.CTkFrame,
 
 
 def get_dropdown(current_frame: ctk.CTkFrame,
-                 options: list[str]) -> ctk.StringVar:
+                 options_func: Callable[[], list[str]]
+                 ) -> tuple[ctk.StringVar, ctk.CTkOptionMenu]:
     """
-    Create a dropdown menu with a list of options and returns the variable
-    holding the selected option.
+    Create a dropdown menu with dynamically provided options.
 
     Args:
-        current_frame (ctk.CTkFrame): The frame in which the dropdown menu
-                                      will be placed.
-        options (list[str]): A list of options to be displayed in the dropdown
-                             menu.
+        current_frame (ctk.CTkFrame): Frame for the dropdown.
+        options_func (Callable[[], list[str]]): Function returning the options
+                                                list.
 
     Returns:
-        ctk.StringVar: A StringVar that holds the selected option from the
-                       dropdown menu.
+        tuple[ctk.StringVar, ctk.CTkOptionMenu]: StringVar and CTkOptionMenu
+                                                 instance.
     """
     dropdown_str_var = ctk.StringVar(current_frame)
-    dropdown_str_var.set(options[0])  # Default to the first option
+    options = options_func()
+    dropdown_str_var.set(options[0] if options else "")
     dropdown = ctk.CTkOptionMenu(
         current_frame, variable=dropdown_str_var, values=options)
     dropdown.pack(pady=scale(STANDARD_PADY), padx=scale(20))
-
     dropdown.configure(font=get_font(SMALL_FONT_SIZE))
+    return dropdown_str_var, dropdown
 
-    return dropdown_str_var
+
+BUILDINGS = get_buildings_list("buildings.txt")
+
+DEPARTMENTS = {
+    "Biology": "NCSU-COS-BIO",
+    "Bioinformatics": "NCSU-COS-BRC",
+    "Chemistry": "NCSU-COS-CHEM",
+    "Mathematics": "NCSU-COS-MATH",
+    "MEAS": "NCSU-COS-MEAS",
+    "Physics": "NCSU-COS-PHYSICS",
+    "SCO": "NCSU-COS-SCO",
+    "Statistics": "NCSU-COS-STAT",
+    "Other": "NCSU-COS"
+}
+
+DEPARTMENT_BUILDINGS = {
+    "Biology": [],
+    "Bioinformatics": [],
+    "Chemistry": ["SAS Hall", "Cox Hall",
+                  "Dabney Hall"],
+    "Mathematics": ["SAS Hall", "Cox Hall",
+                    "Dabney Hall", "Language and Computer Laboratories"],
+    "MEAS": [],
+    "Physics": [],
+    "SCO": [],
+    "Statistics": ["SAS Hall"],
+    "Other": []  # All building options
+}
 
 
-def building_department_input(first_name: str, last_name: str):
-    """
-    Display the page for selecting the building and department, and handles
-    saving the selections.
-
-    This function clears the root window, presents dropdown menus for selecting
-    a building and department, and provides a button to submit the selections.
-    Upon submission, the selections are saved.
+def building_department_input(first_name: str, last_name: str) -> None:
+    """Displays building and department selection, dynamically updating
+    building options.
 
     Args:
-        first_name (str): The user's first name.
-        last_name (str): The user's last name.
+        first_name (str): The user's first name
+        last_name (str): The user's last name
 
     Returns:
         None: This function does not return a value.
     """
     clear_root()
-
     building_department_frame = ctk.CTkFrame(root)
     building_department_frame.pack(expand=True)
 
     get_selection_label(building_department_frame, "department")
 
     department_str_var = get_dropdown(
-        building_department_frame, list(DEPARTMENTS.keys()))
+        building_department_frame, lambda: list(DEPARTMENTS.keys()))[0]
+
+    def get_building_options():
+        department = department_str_var.get()
+        return DEPARTMENT_BUILDINGS.get(department, BUILDINGS)
 
     get_selection_label(building_department_frame, "building")
 
-    building_str_var = get_dropdown(building_department_frame, BUILDINGS)
+    building_str_var, building_dropdown = get_dropdown(
+        building_department_frame, get_building_options)
+
+    def update_building_dropdown(*args):  # pylint: disable=W0613
+        building_dropdown.configure(values=get_building_options())
+        if get_building_options():
+            building_str_var.set(get_building_options()[0])
+
+    department_str_var.trace_add("write", update_building_dropdown)
 
     def proceed():
-        department = department_str_var.get()
         building = building_str_var.get()
-        if department and building:
-            save_input(first_name, last_name, department, building)
+        if department_str_var.get() and building:
+            save_input(first_name, last_name,
+                       department_str_var.get(), building)
 
     submit_button = make_button(
         building_department_frame, text="Submit", command=proceed)
@@ -450,8 +468,8 @@ def save_input(first_name: str, last_name: str,
     and performs a system action.
 
     The function appends the provided user input, along with the current
-    timestamp, to a file called "user_input.txt". It also executes a system
-    command and then quits the program.
+    timestamp, to a file. It also executes a system command and then quits the
+    program.
 
     Args:
         first_name (str): The user's first name.

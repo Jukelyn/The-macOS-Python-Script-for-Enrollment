@@ -113,7 +113,7 @@ def get_font(scaling: int, bold: bool = False) -> tuple[str, int, str]:
     return (BASE_FONT, scale(scaling), "bold")
 
 
-def get_info_list(filename: str) -> list[str]:
+def get_buildings_list(filename: str) -> list[str]:
     """Reads lines from text file and returns a list of the contents.
 
     Args:
@@ -126,18 +126,25 @@ def get_info_list(filename: str) -> list[str]:
 
     with open(filename, "r", encoding="utf-8") as file:
         for line in file:
-            if line.strip().lower() == "other":
-                continue
             if line.strip() != "":
                 info_list.append(line.strip())
 
     return sorted(info_list)
 
 
-DEPARTMENTS = get_info_list("departments.txt")
-DEPARTMENTS.append("Other")
+DEPARTMENTS = {
+    "Biology": "NCSU-COS-BIO",
+    "Bioinformatics": "NCSU-COS-BRC",
+    "Chemistry": "NCSU-COS-CHEM",
+    "Mathematics": "NCSU-COS-MATH",
+    "MEAS": "NCSU-COS-MEAS",
+    "Physics": "NCSU-COS-PHYSICS",
+    "SCO": "NCSU-COS-SCO",
+    "Statistics": "NCSU-COS-STAT",
+    "Other": "NCSU-COS"
+}
 
-BUILDINGS = get_info_list("buildings.txt")
+BUILDINGS = get_buildings_list("buildings.txt")
 
 
 def load_background(tk: ctk.CTk, image_path: str):
@@ -454,9 +461,10 @@ def save_input(first_name: str, last_name: str,
     command = f'/usr/bin/say "{first_name} {last_name}"'
     # command = (
     #     f'sudo /usr/bin/jamf recon -realname "{first_name} {last_name}"'
-    #     f' -building {building}'
+    #     f' -building "{building}"'
     #     # f' -department {DEPARTMENT}'
     # )
+
     # jamf command:
     # /usr/local/bin/jamf recon [flags]
     # -realname [str]     '-realname "[first name] [last name]"'
